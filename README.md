@@ -7,18 +7,71 @@
 
 ---
 
-This project provides a [PyTorch](https://pytorch.org/get-started/locally/) Python index mirror that adds necessary strict PEP 503 format requirements permitting to use it with [Nexus Repository](https://help.sonatype.com/en/pypi-repositories.html#download--search--and-install-packages-using-pip).
+This project provides a [PyTorch](https://pytorch.org/get-started/locally/) Python index mirror that adds necessary strict PEP 503 format requirements permitting to use it with [Nexus Repository](https://help.sonatype.com/en/pypi-repositories.html#download--search--and-install-packages-using-pip) — or directly with `pip`, `uv`, and `poetry`.
+
+The index is regenerated daily via GitHub Actions from <https://download.pytorch.org/whl/> and published to GitHub Pages at <https://sonatype-nexus-community.github.io/pytorch-pypi/whl/>. Wheels themselves are not re-hosted; the generated `index.html` files link back to PyTorch's CDN.
 
 - [Sonatype PyTorch PyPI Improved Mirror](#sonatype-pytorch-pypi-improved-mirror)
-  - [Usage](#usage)
-    - [Installation](#installation)
-    - [Access With `pip`](#access-with-pip)
+  - [Available indexes](#available-indexes)
+  - [Direct usage (pip / uv / poetry)](#direct-usage-pip--uv--poetry)
+  - [Usage with Nexus Repository](#usage-with-nexus-repository)
   - [Development](#development)
   - [The Fine Print](#the-fine-print)
 
-## Usage
+## Available indexes
 
-### Installation
+Base URL: `https://sonatype-nexus-community.github.io/pytorch-pypi/whl/`
+
+| Variant         | Index URL suffix          | Notes                              |
+|-----------------|---------------------------|------------------------------------|
+| All packages    | `simple/`                 | Full mirror, all platforms         |
+| CPU only        | `cpu/simple/`             |                                    |
+| CPU (cxx11 ABI) | `cpu-cxx11-abi/simple/`   |                                    |
+| CUDA 11.8       | `cu118/simple/`           |                                    |
+| CUDA 12.1       | `cu121/simple/`           |                                    |
+| CUDA 12.4       | `cu124/simple/`           |                                    |
+| CUDA 12.6       | `cu126/simple/`           |                                    |
+| CUDA 12.8       | `cu128/simple/`           |                                    |
+| CUDA 12.9       | `cu129/simple/`           |                                    |
+| CUDA 13.0       | `cu130/simple/`           |                                    |
+| ROCm 6.0–6.4    | `rocm6.X/simple/`         | `rocm6.0`, `rocm6.1`, …, `rocm6.4` |
+| Intel XPU       | `xpu/simple/`             |                                    |
+| Nightly         | `nightly/simple/`         | Pre-release builds                 |
+
+The authoritative list of currently published variants is browsable at <https://sonatype-nexus-community.github.io/pytorch-pypi/whl/>.
+
+## Direct usage (pip / uv / poetry)
+
+### `pip`
+
+```sh
+pip install torch --index-url https://sonatype-nexus-community.github.io/pytorch-pypi/whl/cu129/simple
+```
+
+### `uv`
+
+```sh
+uv pip install torch --index-url https://sonatype-nexus-community.github.io/pytorch-pypi/whl/cu129/simple
+```
+
+Or in `pyproject.toml`:
+
+```toml
+[[tool.uv.index]]
+name = "pytorch-cu129"
+url = "https://sonatype-nexus-community.github.io/pytorch-pypi/whl/cu129/simple"
+```
+
+### Poetry
+
+```toml
+[[tool.poetry.source]]
+name = "pytorch-cu129"
+url = "https://sonatype-nexus-community.github.io/pytorch-pypi/whl/cu129/simple"
+priority = "explicit"
+```
+
+## Usage with Nexus Repository
 
 As a [Nexus Repository](https://help.sonatype.com/en/sonatype-nexus-repository.html) admin, configure a [new PyPI proxy](https://help.sonatype.com/en/pypi-repositories.html#proxying-pypi-repositories) repository:
 - define name: `pypi-pytorch` for example

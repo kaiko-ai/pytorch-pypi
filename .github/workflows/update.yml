@@ -7,18 +7,24 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          persist-credentials: false
 
       - name: Checkout gh-pages
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           ref: 'gh-pages'
           path: 'gh-pages'
+          persist-credentials: false
 
       - name: Update Reports
         run: ./update-pytorch.sh
@@ -29,9 +35,13 @@ jobs:
         run: |
           cd gh-pages
           git update-index -q --refresh
-          git diff-index --quiet HEAD && exit 0 # commit only if something to do
+          git diff-index --quiet HEAD && exit 0 # nothing changed
           git config --local user.email "ci@github.io"
           git config --local user.name "Update CI"
+          git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          # Replace gh-pages with a single fresh commit to keep the branch
+          # from growing unbounded (the content is fully regenerated each run).
+          git checkout --orphan tmp-orphan
           git add -A
           git commit -m "nightly update"
-          git push
+          git push -f origin tmp-orphan:gh-pages
