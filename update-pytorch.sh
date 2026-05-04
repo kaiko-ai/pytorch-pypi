@@ -62,10 +62,22 @@ updateIndex() {
     i=$((i+1))
     (
       cd "$p"
-      curl -sf "https://download.pytorch.org/$d/$p/" \
+      body="$(curl -sS -w '\n%{http_code}' "https://download.pytorch.org/$d/$p/")" || {
+        echo "skipping $d/$p: curl failed" >&2
+        : > index.html
+        exit 0
+      }
+      http_code="${body##*$'\n'}"
+      body="${body%$'\n'*}"
+      if [ "$http_code" != "200" ]; then
+        echo "skipping $d/$p: HTTP $http_code" >&2
+        : > index.html
+        exit 0
+      fi
+      printf '%s' "$body" \
         | sed -e 's_href="/whl_href="https://download.pytorch.org/whl_' \
         | grep -v 'TIMESTAMP 1' \
-        > index.html
+        > index.html || true
       pcount="$(grep -c 'https://download.pytorch.org/whl/' index.html || true)"
       printf "%5d / %s                   %s/%s/ => %s/simple/%s/ %s\n" "$i" "$count" "$d" "$p" "$d" "$p" "$pcount"
     )
