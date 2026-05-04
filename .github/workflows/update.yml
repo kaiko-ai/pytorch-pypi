@@ -8,7 +8,9 @@ on:
     branches: [main]
     paths:
       - .github/workflows/update.yml
-      - update-pytorch.sh
+      - '**.go'
+      - go.mod
+      - go.sum
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -39,8 +41,13 @@ jobs:
             git -C gh-pages remote add origin "https://github.com/${GITHUB_REPOSITORY}.git"
           fi
 
+      - name: Set up Go
+        uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
+        with:
+          go-version-file: go.mod
+
       - name: Update Reports
-        run: ./update-pytorch.sh
+        run: go run . -root gh-pages
 
       - name: Commit Push
         env:
