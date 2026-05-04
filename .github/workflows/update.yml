@@ -20,11 +20,18 @@ jobs:
           persist-credentials: false
 
       - name: Checkout gh-pages
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
-        with:
-          ref: 'gh-pages'
-          path: 'gh-pages'
-          persist-credentials: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          remote="https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          if git ls-remote --exit-code --heads "$remote" gh-pages >/dev/null 2>&1; then
+            git clone -q --depth=1 --branch gh-pages "$remote" gh-pages
+          else
+            mkdir gh-pages
+            git -C gh-pages init -q -b gh-pages
+            git -C gh-pages remote add origin "https://github.com/${GITHUB_REPOSITORY}.git"
+          fi
 
       - name: Update Reports
         run: ./update-pytorch.sh
