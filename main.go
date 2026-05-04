@@ -300,6 +300,7 @@ func writeSummary() error {
 	}
 
 	var b bytes.Buffer
+	fmt.Fprintf(&b, "# generated %s\n", time.Now().UTC().Format(time.RFC3339))
 	for _, p := range paths {
 		entries, err := os.ReadDir(p)
 		if err != nil {
