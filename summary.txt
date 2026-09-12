@@ -1,0 +1,20 @@
+# generated 2026-09-12T04:52:33Z
+197 whl/simple
+86 whl/cpu-cxx11-abi/simple
+114 whl/cpu/simple
+131 whl/cpu_pypi_pkg/simple
+124 whl/cu118/simple
+123 whl/cu121/simple
+114 whl/cu124/simple
+120 whl/cu126/simple
+120 whl/cu128/simple
+118 whl/cu129/simple
+118 whl/cu130/simple
+343 whl/nightly/simple
+108 whl/rocm6.0/simple
+111 whl/rocm6.1/simple
+111 whl/rocm6.2.4/simple
+109 whl/rocm6.2/simple
+111 whl/rocm6.3/simple
+111 whl/rocm6.4/simple
+112 whl/xpu/simple
